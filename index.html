@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>DIGITAL MINDS 03 — CORE LAB</title>
+<style>
+  :root{
+    --bg:#080D2A;
+    --bg-panel:#101A45;
+    --bg-panel-2:#152155;
+    --border:#243061;
+    --text:#F2F4F9;
+    --text-dim:#AEB7D1;
+    --blue:#246BFD;
+    --blue-dark:#1B4FC2;
+    --blue-tint:rgba(36,107,253,.14);
+    --green:#35D18A;
+    --green-tint:rgba(53,209,138,.14);
+    --red:#FF6B6B;
+    --red-tint:rgba(255,107,107,.14);
+    --amber:#FFB84D;
+    --amber-tint:rgba(255,184,77,.14);
+    --radius:14px;
+    --maxw:760px;
+    font-size:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(circle at 20% 0%, #0F1C4D 0%, var(--bg) 55%);
+    color:var(--text);
+    font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    min-height:100vh;
+    line-height:1.5;
+  }
+  #app{ max-width:var(--maxw); margin:0 auto; padding:20px 16px 60px; }
+  .eyebrow{ letter-spacing:.14em; text-transform:uppercase; font-size:.75rem; color:var(--text-dim); font-weight:600; }
+  h1{font-size:1.8rem;margin:.2em 0 .1em;}
+  h2{font-size:1.25rem;margin:1.2em 0 .5em;}
+  h3{font-size:1.02rem;margin:.9em 0 .4em;color:var(--text);}
+  p{color:var(--text-dim);}
+  .card{ background:var(--bg-panel); border:1px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:14px; }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    min-height:52px; padding:12px 20px; border-radius:12px;
+    border:1px solid var(--blue); background:var(--blue); color:#fff;
+    font-size:1rem; font-weight:600; cursor:pointer; width:100%; text-align:center;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .btn:active{transform:scale(.98);}
+  .btn.secondary{ background:transparent; color:var(--text); border:1px solid var(--border); }
+  .btn.ghost{ background:transparent; color:var(--blue); border:1px solid var(--blue); }
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
+  .btn-row .btn{flex:1 1 140px;}
+
+  .door{ display:flex; align-items:center; justify-content:space-between; gap:12px; text-align:left; }
+  .door.unlocked{cursor:pointer;}
+  .door.locked{opacity:.45;}
+  .door .meta{color:var(--text-dim);font-size:.85rem;margin-top:2px;}
+  .door .arrow{font-size:1.3rem;color:var(--blue);flex-shrink:0;}
+  .pill{ display:inline-block; font-size:.7rem; text-transform:uppercase; letter-spacing:.06em; padding:3px 9px; border-radius:999px; border:1px solid var(--border); color:var(--text-dim); }
+  .pill.done{ color:var(--green); border-color:rgba(53,209,138,.5); }
+
+  .progress-track{ background:var(--bg-panel-2); border-radius:999px; height:10px; overflow:hidden; margin:8px 0 4px; }
+  .progress-fill{ background:linear-gradient(90deg,var(--blue),var(--green)); height:100%; width:0%; transition:width .4s ease; }
+  .progress-label{font-size:.8rem;color:var(--text-dim);}
+
+  .topbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .backlink{ color:var(--text-dim); background:none; border:none; font-size:.95rem; cursor:pointer; padding:8px 0; min-height:44px; }
+
+  .choice-list{display:flex;flex-direction:column;gap:8px;margin:12px 0;}
+  .choice{ background:var(--bg-panel-2); border:1px solid var(--border); border-radius:10px; padding:14px; cursor:pointer; min-height:48px; display:flex; align-items:center; font-size:.95rem; }
+  .choice:active{transform:scale(.99);}
+  .choice.correct{border-color:var(--green); background:var(--green-tint);}
+  .choice.incorrect{border-color:var(--red); background:var(--red-tint);}
+  .choice.disabled{cursor:default;}
+  .choice.muted{opacity:.55;}
+
+  .feedback{ border-radius:10px; padding:14px; margin-top:12px; font-size:.92rem; }
+  .feedback.ok{background:var(--green-tint);color:var(--green);border:1px solid rgba(53,209,138,.4);}
+  .feedback.warn{background:var(--red-tint);color:var(--red);border:1px solid rgba(255,107,107,.4);}
+  .feedback.info{background:var(--blue-tint);color:#cfe0ff;border:1px solid rgba(36,107,253,.4);}
+  .meta-tags{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+  .meta-tag{font-size:.72rem; padding:3px 9px; border-radius:999px; background:var(--bg-panel-2); border:1px solid var(--border); color:var(--text-dim);}
+
+  .badge{ display:inline-block; font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; padding:3px 8px; border-radius:999px; background:var(--bg-panel-2); color:var(--text-dim); border:1px solid var(--border); }
+  .hidden{display:none !important;}
+  .center{text-align:center;}
+  .small{font-size:.82rem;color:var(--text-dim);}
+  hr{border:none;border-top:1px solid var(--border);margin:20px 0;}
+  footer{margin-top:40px;text-align:center;color:var(--text-dim);font-size:.78rem;}
+
+  .qcounter{font-size:.8rem;color:var(--text-dim);margin-bottom:6px;}
+
+  @media (min-width:600px){ :root{font-size:17px;} }
+</style>
+</head>
+<body>
+<div id="app" role="main"></div>
+
+<script>
+/* =========================================================
+   DIGITAL MINDS 03 — CORE LAB (version statique v2)
+   « Entre dans la salle des machines. »
+   Fichier HTML autonome — HTML + CSS + JavaScript vanilla.
+   Aucune dépendance externe, aucun compte, aucune API
+   obligatoire, aucune collecte de données. La progression
+   est conservée uniquement dans le navigateur (localStorage),
+   avec repli silencieux en mémoire si indisponible.
+
+   Source de vérité : le manuscrit DIGITAL MINDS 03 — CORE.
+   Chaque question reprend un concept et un chapitre réels du
+   livre — rien n'est inventé au-delà de son contenu.
+   ========================================================= */
+
+/* =========================================================
+   1. CONFIGURATION
+   ========================================================= */
+const CONFIG = {
+  titre: "DIGITAL MINDS 03",
+  sousTitre: "CORE LAB",
+  accroche: "Entre dans la salle des machines.",
+  cleStockage: "core-lab-static-progression-v1",
+  seuilMaitrise: 2, // sur 3 questions
+};
+
+/* =========================================================
+   2. DONNÉES DES MODULES (21 questions — 3 par module)
+   ========================================================= */
+const MODULES = [
+  {
+    id: "cpu", nom: "CPU", resume: "Chercher → décoder → exécuter",
+    questions: [
+      {
+        id: "cpu1",
+        enonce: "Quel est l'ordre correct du cycle simplifié du processeur ?",
+        choix: ["Décoder → Chercher → Exécuter", "Chercher → Décoder → Exécuter", "Exécuter → Chercher → Décoder", "Chercher → Exécuter → Décoder"],
+        bonne: 1,
+        expl: [
+          "Ce n'est pas cet ordre : on ne peut pas décoder une instruction qu'on n'a pas encore cherchée.",
+          "C'est le bon ordre : on cherche l'instruction, on décode ce qu'elle demande, puis on l'exécute.",
+          "Ce n'est pas cet ordre : on ne peut pas exécuter une instruction avant de l'avoir cherchée et décodée.",
+          "Ce n'est pas cet ordre : décoder doit précéder l'exécution, pas la suivre."
+        ],
+        principe: "Cycle du processeur", chapitre: "Chapitre 4"
+      },
+      {
+        id: "cpu2",
+        enonce: "Que signifie, précisément, l'étape « décoder » ?",
+        choix: ["Aller chercher l'instruction suivante", "Déterminer ce que l'instruction demande réellement", "Effectuer le calcul demandé", "Stocker le résultat en mémoire"],
+        bonne: 1,
+        expl: [
+          "C'est la définition de « chercher », pas de « décoder ».",
+          "Exact : décoder, c'est déterminer ce que l'instruction demande avant de l'exécuter.",
+          "C'est la définition de « exécuter », l'étape suivante.",
+          "Stocker un résultat fait partie de l'exécution, pas du décodage."
+        ],
+        principe: "Cycle du processeur", chapitre: "Chapitre 4"
+      },
+      {
+        id: "cpu3",
+        enonce: "Pourquoi une opération simple semble-t-elle instantanée sur une machine ?",
+        choix: ["Parce que le cycle n'a qu'une seule étape", "Parce que le cycle se répète un très grand nombre de fois par seconde", "Parce que le processeur devine le résultat à l'avance", "Parce que la mémoire fait le calcul à la place du processeur"],
+        bonne: 1,
+        expl: [
+          "Le cycle a bien trois étapes distinctes, pas une seule.",
+          "C'est la bonne explication : la répétition très rapide du cycle crée l'illusion d'instantanéité.",
+          "Un processeur n'improvise ni ne devine : il applique un mécanisme précis.",
+          "La mémoire stocke des données, elle ne calcule pas à la place du processeur."
+        ],
+        principe: "Vitesse perçue", chapitre: "Chapitre 4"
+      },
+    ],
+  },
+  {
+    id: "memory", nom: "MEMORY", resume: "Mémoire de travail, limite et volatilité",
+    questions: [
+      {
+        id: "mem1",
+        enonce: "Pourquoi dit-on que la mémoire de travail (RAM) est « volatile » ?",
+        choix: ["Elle chauffe rapidement", "Elle perd son contenu sans alimentation électrique continue", "Elle ne peut stocker que du texte", "Elle est toujours plus lente que le stockage"],
+        bonne: 1,
+        expl: [
+          "La chaleur n'est pas ce que « volatile » désigne ici.",
+          "Exact : sans alimentation continue, la mémoire de travail perd tout son contenu.",
+          "La mémoire de travail peut contenir tout type de donnée, pas seulement du texte.",
+          "C'est l'inverse : la mémoire de travail est généralement plus rapide que le stockage."
+        ],
+        principe: "Volatilité", chapitre: "Chapitre 5"
+      },
+      {
+        id: "mem2",
+        enonce: "Que se passe-t-il quand la mémoire de travail est pleine et qu'un programme réclame plus d'espace ?",
+        choix: ["La machine s'arrête définitivement", "Le système doit faire des choix, par exemple libérer de l'espace", "La mémoire s'agrandit automatiquement sans limite", "Le processeur ralentit son propre cycle de calcul"],
+        bonne: 1,
+        expl: [
+          "Un espace plein entraîne un arbitrage, pas un arrêt définitif.",
+          "Exact : un espace limité oblige à faire des choix, comme n'importe quelle ressource limitée.",
+          "La mémoire de travail a une capacité physique fixe, elle ne s'agrandit pas toute seule.",
+          "Ce n'est pas le cycle du processeur qui est directement affecté, mais l'espace mémoire disponible."
+        ],
+        principe: "Capacité limitée", chapitre: "Chapitre 5"
+      },
+      {
+        id: "mem3",
+        enonce: "Quel est l'avantage principal de la mémoire de travail par rapport au stockage durable ?",
+        choix: ["Elle garde les données indéfiniment", "Elle est beaucoup plus rapide d'accès", "Elle coûte toujours moins cher", "Elle ne demande aucune électricité"],
+        bonne: 1,
+        expl: [
+          "C'est l'inverse : c'est le stockage qui garde les données durablement, pas la mémoire de travail.",
+          "Exact : la rapidité d'accès est précisément ce qui rend la mémoire de travail utile.",
+          "Le coût n'est pas la distinction présentée dans le livre.",
+          "La mémoire de travail a justement besoin d'une alimentation continue pour fonctionner."
+        ],
+        principe: "Vitesse vs persistance", chapitre: "Chapitre 5"
+      },
+    ],
+  },
+  {
+    id: "storage", nom: "STORAGE", resume: "Persistance, enregistrement, extinction",
+    questions: [
+      {
+        id: "sto1",
+        enonce: "Qu'est-ce qui différencie fondamentalement le stockage durable de la mémoire de travail ?",
+        choix: ["Le stockage est toujours plus rapide", "Le stockage conserve l'information sans alimentation continue", "Le stockage ne peut contenir que des photos", "Le stockage est utilisé uniquement par le processeur"],
+        bonne: 1,
+        expl: [
+          "C'est l'inverse : le stockage est généralement plus lent d'accès que la mémoire de travail.",
+          "Exact : la persistance sans alimentation continue est la caractéristique clé du stockage.",
+          "Le stockage peut contenir n'importe quel type de fichier, pas seulement des photos.",
+          "Le stockage est sollicité par les programmes via le système, pas seulement par le processeur seul."
+        ],
+        principe: "Persistance", chapitre: "Chapitre 6"
+      },
+      {
+        id: "sto2",
+        enonce: "Que signifie concrètement « enregistrer » un fichier ?",
+        choix: ["Supprimer le fichier de la mémoire de travail", "Faire passer l'information de la mémoire de travail vers le stockage durable", "Redémarrer la machine", "Compresser le fichier pour qu'il prenne moins de place"],
+        bonne: 1,
+        expl: [
+          "Enregistrer ne supprime pas l'information, il la fait persister ailleurs.",
+          "Exact : enregistrer, c'est transférer l'information vers le stockage durable.",
+          "Redémarrer la machine n'a rien à voir avec l'action d'enregistrer.",
+          "La compression est une opération distincte, pas la définition d'« enregistrer »."
+        ],
+        principe: "Enregistrement", chapitre: "Chapitre 6"
+      },
+      {
+        id: "sto3",
+        enonce: "Pourquoi un texte non enregistré peut-il disparaître après une extinction brutale ?",
+        choix: ["Parce qu'il n'a jamais quitté la mémoire de travail, volatile", "Parce que le stockage durable a été effacé", "Parce que le processeur l'a supprimé volontairement", "Parce que les fichiers texte ne peuvent jamais être enregistrés"],
+        bonne: 0,
+        expl: [
+          "Exact : tant qu'il n'est pas enregistré, le texte reste uniquement en mémoire de travail, qui s'efface sans électricité.",
+          "Le stockage durable n'est pas en cause ici, puisque le texte n'y a jamais été écrit.",
+          "Le processeur n'a aucune raison de supprimer volontairement quoi que ce soit.",
+          "Les fichiers texte peuvent parfaitement être enregistrés, comme tout autre type de fichier."
+        ],
+        principe: "Volatilité vs persistance", chapitre: "Chapitre 6"
+      },
+    ],
+  },
+  {
+    id: "system", nom: "SYSTEM", resume: "Matériel, système d'exploitation, programmes",
+    questions: [
+      {
+        id: "sys1",
+        enonce: "Quel est le rôle principal du système d'exploitation ?",
+        choix: ["Calculer à la place du processeur", "Coordonner l'accès aux ressources et fournir des services aux programmes", "Remplacer la mémoire de travail", "Afficher uniquement les images à l'écran"],
+        bonne: 1,
+        expl: [
+          "Le système d'exploitation ne calcule pas à la place du processeur.",
+          "Exact : son rôle central est la coordination des ressources et les services rendus aux programmes.",
+          "Le système d'exploitation ne remplace pas la mémoire de travail, il en organise l'usage.",
+          "L'affichage n'est qu'un service parmi beaucoup d'autres qu'il coordonne."
+        ],
+        principe: "Rôle du système d'exploitation", chapitre: "Chapitre 8"
+      },
+      {
+        id: "sys2",
+        enonce: "Comment une application ordinaire accède-t-elle généralement aux ressources de la machine ?",
+        choix: ["Directement, sans aucun intermédiaire", "Généralement à travers les interfaces fournies par le système d'exploitation", "Uniquement via une connexion Internet", "En modifiant directement le matériel physique"],
+        bonne: 1,
+        expl: [
+          "Ce n'est généralement pas le cas pour une application ordinaire.",
+          "Exact : les applications passent par les mécanismes que le système d'exploitation met à leur disposition.",
+          "Aucune connexion Internet n'est nécessaire pour accéder aux ressources locales.",
+          "Une application ordinaire ne modifie pas directement le matériel physique."
+        ],
+        principe: "Intermédiation du système", chapitre: "Chapitre 8"
+      },
+      {
+        id: "sys3",
+        enonce: "Que fait le système d'exploitation quand deux programmes veulent utiliser le processeur en même temps ?",
+        choix: ["Il arrête l'un des deux programmes définitivement", "Il arbitre et partage l'accès entre eux", "Il fusionne les deux programmes en un seul", "Il ignore systématiquement la demande la plus récente"],
+        bonne: 1,
+        expl: [
+          "Il n'arrête pas un programme simplement parce qu'un autre en fait la demande.",
+          "Exact : l'arbitrage et le partage de l'accès sont au cœur du rôle du système d'exploitation.",
+          "Fusionner des programmes n'a pas de sens dans ce contexte.",
+          "Il ne s'agit pas d'ignorer une demande, mais de les coordonner toutes."
+        ],
+        principe: "Arbitrage", chapitre: "Chapitre 8"
+      },
+    ],
+  },
+  {
+    id: "processes", nom: "PROCESSES", resume: "Alternance, multitâche, plusieurs cœurs",
+    questions: [
+      {
+        id: "proc1",
+        enonce: "Qu'est-ce qu'un processus ?",
+        choix: ["Une pièce physique du processeur", "Une instance d'un programme en cours d'exécution", "Un type particulier de mémoire", "Un fichier enregistré sur le disque"],
+        bonne: 1,
+        expl: [
+          "Un processus n'est pas une pièce physique, c'est une notion logicielle.",
+          "Exact : un processus est un programme en cours d'exécution, avec ses propres données.",
+          "Ce n'est pas un type de mémoire, mais ce qui utilise la mémoire.",
+          "Un fichier enregistré est passif ; un processus est une exécution active."
+        ],
+        principe: "Définition d'un processus", chapitre: "Chapitre 10"
+      },
+      {
+        id: "proc2",
+        enonce: "Comment plusieurs cœurs de calcul permettent-ils un vrai multitâche ?",
+        choix: ["Chaque cœur peut traiter un processus réellement en parallèle des autres", "Un seul cœur fait semblant d'en avoir plusieurs", "Les cœurs ne servent qu'à refroidir la machine", "Un cœur ne peut traiter qu'un seul processus pendant toute sa durée de vie"],
+        bonne: 0,
+        expl: [
+          "Exact : plusieurs cœurs permettent une exécution réellement simultanée, pas une simple illusion.",
+          "C'est l'alternance sur un seul cœur qui crée cette impression, pas la définition d'un cœur.",
+          "Les cœurs de calcul traitent des instructions, ils ne servent pas au refroidissement.",
+          "Un cœur traite les processus les uns après les autres au fil du temps, pas un seul à vie."
+        ],
+        principe: "Parallélisme réel", chapitre: "Chapitre 10"
+      },
+      {
+        id: "proc3",
+        enonce: "Que se passe-t-il quand il y a plus de processus actifs que de cœurs disponibles ?",
+        choix: ["La machine s'éteint automatiquement", "Le système d'exploitation fait alterner rapidement l'accès au processeur entre eux", "Les processus en trop sont supprimés sans préavis", "Chaque processus ralentit son propre cycle interne de calcul"],
+        bonne: 1,
+        expl: [
+          "Un surplus de processus n'entraîne pas une extinction automatique.",
+          "Exact : c'est précisément dans ce cas que l'alternance rapide entre en jeu.",
+          "Les processus ne sont pas supprimés simplement parce qu'ils sont nombreux.",
+          "Le cycle du processeur lui-même ne change pas ; c'est l'accès qui est partagé dans le temps."
+        ],
+        principe: "Alternance", chapitre: "Chapitre 10"
+      },
+    ],
+  },
+  {
+    id: "performance", nom: "PERFORMANCE", resume: "Repos, charge, observation, saturation",
+    questions: [
+      {
+        id: "perf1",
+        enonce: "Quelle est la bonne méthode pour observer une ressource comme le processeur ?",
+        choix: ["Regarder un seul chiffre isolé, sans contexte", "Comparer un état de repos à un état sous charge", "Redémarrer systématiquement la machine avant de regarder", "Ne jamais consulter le moniteur système"],
+        bonne: 1,
+        expl: [
+          "Un chiffre isolé, sans comparaison, n'apprend presque rien.",
+          "Exact : comparer repos et charge révèle un véritable lien de cause à effet.",
+          "Redémarrer n'est pas nécessaire pour observer une ressource.",
+          "Le moniteur système est au contraire un outil utile, à condition de bien le lire."
+        ],
+        principe: "Méthode d'observation", chapitre: "Chapitre 11"
+      },
+      {
+        id: "perf2",
+        enonce: "D'où vient le plus souvent un ralentissement perçu ?",
+        choix: ["Toujours de l'âge de la machine", "D'une ressource ou contrainte précise, qu'il faut identifier par l'observation", "Toujours d'un virus informatique", "D'aucune cause identifiable en pratique"],
+        bonne: 1,
+        expl: [
+          "L'âge seul n'explique pas une contrainte précise observable.",
+          "Exact : une contrainte précise est identifiable par l'observation, plutôt que supposée.",
+          "Un virus n'est qu'une cause possible parmi beaucoup d'autres, pas une règle systématique.",
+          "Une cause est presque toujours identifiable par une observation méthodique."
+        ],
+        principe: "Cause d'un ralentissement", chapitre: "Chapitre 12"
+      },
+      {
+        id: "perf3",
+        enonce: "Pourquoi observer une ressource « avant et pendant » une tâche précise, plutôt qu'à un instant isolé ?",
+        choix: ["Cela ne change rien au résultat obtenu", "Cela permet de relier un changement de ressource à une cause précise", "Cela prend moins de temps qu'une observation isolée", "Ce n'est utile que pour observer le stockage"],
+        bonne: 1,
+        expl: [
+          "Cela change beaucoup : sans comparaison, impossible d'établir un lien de cause à effet.",
+          "Exact : c'est cette comparaison qui permet d'identifier une cause avec confiance.",
+          "Ce n'est pas une question de rapidité, mais de fiabilité de l'observation.",
+          "Cette méthode s'applique à toutes les ressources, pas seulement au stockage."
+        ],
+        principe: "Méthode d'observation", chapitre: "Chapitre 11"
+      },
+    ],
+  },
+  {
+    id: "diagnostic", nom: "DIAGNOSTIC", resume: "Symptôme → hypothèse → test → résultat → diagnostic",
+    questions: [
+      {
+        id: "diag1",
+        enonce: "Qu'est-ce qu'un symptôme, dans la méthode de diagnostic ?",
+        choix: ["Une explication déjà trouvée", "Ce qu'on observe concrètement, avant toute explication", "Un test à effectuer", "Une conclusion finale"],
+        bonne: 1,
+        expl: [
+          "Un symptôme n'est pas encore une explication, seulement une observation.",
+          "Exact : le symptôme est ce qu'on constate, avant d'en chercher la cause.",
+          "Le test est une étape distincte, qui vient après l'hypothèse.",
+          "La conclusion arrive à la toute fin, pas au début de la démarche."
+        ],
+        principe: "Définition du symptôme", chapitre: "Chapitre 13"
+      },
+      {
+        id: "diag2",
+        enonce: "Pourquoi faut-il formuler une hypothèse avant de faire un test ?",
+        choix: ["Ce n'est pas nécessaire, on peut tester au hasard", "Cela évite d'interpréter un résultat ambigu comme confirmant ce qu'on pensait déjà", "Cela ralentit inutilement le diagnostic", "Une hypothèse remplace complètement le test"],
+        bonne: 1,
+        expl: [
+          "Tester au hasard, sans hypothèse, rend l'interprétation du résultat beaucoup plus fragile.",
+          "Exact : formuler l'hypothèse d'abord protège contre une interprétation biaisée du résultat.",
+          "Cette étape ne ralentit pas le diagnostic, elle le rend plus fiable.",
+          "L'hypothèse ne remplace jamais le test : elle doit être mise à l'épreuve."
+        ],
+        principe: "Rigueur de l'hypothèse", chapitre: "Chapitre 13"
+      },
+      {
+        id: "diag3",
+        enonce: "Que signifie conclure un diagnostic « avec un niveau de confiance » ?",
+        choix: ["Affirmer une certitude absolue, dans tous les cas", "Indiquer à quel point le résultat soutient réellement la conclusion", "Attendre d'avoir totalement raison avant de répondre", "Ne jamais donner de conclusion explicite"],
+        bonne: 1,
+        expl: [
+          "Une certitude absolue est rarement honnête dans un diagnostic réel.",
+          "Exact : le niveau de confiance précise jusqu'où le résultat soutient vraiment la conclusion.",
+          "Un diagnostic honnête peut rester incertain et le dire, plutôt que d'attendre une certitude illusoire.",
+          "Une conclusion explicite reste nécessaire, même nuancée par un niveau de confiance."
+        ],
+        principe: "Niveau de confiance", chapitre: "Chapitre 13"
+      },
+    ],
+    // Mini-cas de clôture du module DIAGNOSTIC : classer chaque phrase
+    // selon l'étape de la méthode qu'elle illustre.
+    miniCas: {
+      intro: "Voici un petit cas, phrase par phrase. Pour chacune, identifie l'étape de la méthode qu'elle illustre.",
+      categories: ["Symptôme", "Hypothèse", "Test", "Résultat", "Diagnostic", "Niveau de confiance"],
+      items: [
+        { id:"mc1", texte:"« La machine ralentit fortement à l'ouverture d'un gros fichier. »", bonne:0 },
+        { id:"mc2", texte:"« La mémoire de travail est peut-être saturée à ce moment-là. »", bonne:1 },
+        { id:"mc3", texte:"« On observe la mémoire de travail juste avant et pendant l'ouverture du fichier. »", bonne:2 },
+        { id:"mc4", texte:"« La mémoire atteint sa limite exactement au moment du ralentissement. »", bonne:3 },
+        { id:"mc5", texte:"« La mémoire de travail est la cause la plus probable du ralentissement. »", bonne:4 },
+        { id:"mc6", texte:"« Ce résultat est reproductible sur plusieurs essais : confiance élevée. »", bonne:5 },
+      ],
+    },
+  },
+];
+
+/* =========================================================
+   3. LOGIQUE PURE (indépendante du DOM — testable isolément)
+   ========================================================= */
+
+// Construit le résultat d'une "ronde" : qui est maîtrisé, quoi refaire.
+function evaluerRonde(questionsModule, correctEver){
+  const total = questionsModule.length;
+  const nbCorrectes = questionsModule.filter(q => correctEver[q.id]).length;
+  const mastered = nbCorrectes >= CONFIG.seuilMaitrise;
+  const aRefaire = questionsModule.filter(q => !correctEver[q.id]).map(q => q.id);
+  return { mastered, nbCorrectes, total, aRefaire };
+}
+
+// Calcule le bilan final à partir de l'état complet.
+function calculerBilanFinal(modules, state){
+  let scoreGlobal = 0, totalQuestions = 0;
+  const modulesMaitrises = [];
+  const principesMaitrisesPremierEssai = [];
+  const chapitresARevoirSet = {};
+
+  modules.forEach(mod => {
+    const ms = state.modules[mod.id] || { correctEver:{}, firstAttemptCorrect:{}, mastered:false };
+    mod.questions.forEach(q => {
+      totalQuestions++;
+      if (ms.correctEver[q.id]) scoreGlobal++;
+      if (ms.firstAttemptCorrect[q.id] === true){
+        principesMaitrisesPremierEssai.push(q.principe);
+      }
+      if (ms.firstAttemptCorrect[q.id] === false){
+        chapitresARevoirSet[q.chapitre] = true;
+      }
+    });
+    if (ms.mastered) modulesMaitrises.push(mod.nom);
+  });
+
+  return {
+    scoreGlobal, totalQuestions,
+    modulesMaitrises,
+    principesMaitrisesPremierEssai: Array.from(new Set(principesMaitrisesPremierEssai)),
+    chapitresARevoir: Object.keys(chapitresARevoirSet),
+  };
+}
+
+function tousModulesMaitrises(modules, state){
+  return modules.every(mod => state.modules[mod.id] && state.modules[mod.id].mastered);
+}
+
+function miniCasTermine(state){
+  const mc = state.miniCas || {};
+  const diagModule = MODULES.find(m => m.id === "diagnostic");
+  return diagModule.miniCas.items.every(it => mc[it.id] !== undefined);
+}
+
+/* =========================================================
+   4. ÉTAT & PERSISTANCE (localStorage, repli silencieux)
+   ========================================================= */
+function etatInitial(){
+  const modules = {};
+  MODULES.forEach(m => { modules[m.id] = { correctEver:{}, firstAttemptCorrect:{}, mastered:false }; });
+  return { modules, miniCas:{} };
+}
+
+let ETAT_PROGRESSION = chargerProgression();
+
+function chargerProgression(){
+  try{
+    const brut = window.localStorage.getItem(CONFIG.cleStockage);
+    if (!brut) return etatInitial();
+    const data = JSON.parse(brut);
+    if (!data || !data.modules) return etatInitial();
+    return data;
+  }catch(e){
+    return etatInitial();
+  }
+}
+function sauvegarderProgression(){
+  try{ window.localStorage.setItem(CONFIG.cleStockage, JSON.stringify(ETAT_PROGRESSION)); }
+  catch(e){ /* stockage indisponible : la session continue simplement sans persistance */ }
+}
+function reinitialiserProgression(){
+  ETAT_PROGRESSION = etatInitial();
+  sauvegarderProgression();
+}
+
+function moduleEstDebloque(index){
+  if (index === 0) return true;
+  const precedent = MODULES[index-1];
+  const ms = ETAT_PROGRESSION.modules[precedent.id];
+  return !!(ms && ms.mastered);
+}
+
+/* =========================================================
+   5. AFFICHAGE
+   ========================================================= */
+const app = document.getElementById("app");
+const ETAT = { ecran:"accueil", moduleIndex:0, ordre:[], curseur:0, miniCasOrdre:[], miniCasCurseur:0, dernierChoix:null };
+
+function afficherEcran(nom, params={}){
+  ETAT.ecran = nom;
+  Object.assign(ETAT, params);
+  window.scrollTo(0,0);
+  switch(nom){
+    case "accueil": return renderAccueil();
+    case "module": return renderQuestionCourante();
+    case "resumeModule": return renderResumeModule();
+    case "miniCas": return renderMiniCasCourant();
+    case "resumeMiniCas": return renderResumeMiniCas();
+    case "bilanFinal": return renderBilanFinal();
+    default: return renderAccueil();
+  }
+}
+function topbar(titreEcran){
+  return `<div class="topbar">
+    <button class="backlink" onclick="afficherEcran('accueil')">← Accueil</button>
+    <span class="badge">${titreEcran}</span>
+  </div>`;
+}
+function escapeHtml(str){
+  return String(str).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+}
+
+// --- ACCUEIL ---
+function renderAccueil(){
+  const portes = MODULES.map((mod, i) => {
+    const debloque = moduleEstDebloque(i);
+    const ms = ETAT_PROGRESSION.modules[mod.id];
+    const statut = ms.mastered ? `<span class="pill done">Maîtrisé</span>` : (debloque ? `<span class="pill">À faire</span>` : `<span class="pill">Verrouillé</span>`);
+    const clic = debloque ? `onclick="demarrerModule(${i})"` : "";
+    return `
+      <div class="card door ${debloque?'unlocked':'locked'}" ${clic}>
+        <div>
+          <h3>${i+1}. ${mod.nom}</h3>
+          <div class="meta">${mod.resume}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">${statut}${debloque?'<span class="arrow">→</span>':''}</div>
+      </div>`;
+  }).join("");
+
+  const bilan = calculerBilanFinal(MODULES, ETAT_PROGRESSION);
+  const toutMaitrise = tousModulesMaitrises(MODULES, ETAT_PROGRESSION) && miniCasTermine(ETAT_PROGRESSION);
+
+  app.innerHTML = `
+    <div class="center">
+      <div class="eyebrow">${CONFIG.titre}</div>
+      <h1>${CONFIG.sousTitre}</h1>
+      <p>${CONFIG.accroche}</p>
+    </div>
+    <div class="card">
+      <div class="progress-label">Score global — ${bilan.scoreGlobal}/${bilan.totalQuestions} questions maîtrisées</div>
+      <div class="progress-track"><div class="progress-fill" style="width:${Math.round(100*bilan.scoreGlobal/bilan.totalQuestions)}%"></div></div>
+    </div>
+    ${portes}
+    ${toutMaitrise ? `<div class="btn-row"><button class="btn" onclick="afficherEcran('bilanFinal')">Voir le bilan final</button></div>` : ""}
+    <div class="card">
+      <p class="small">Ta progression est conservée uniquement dans ce navigateur. Aucune donnée n'est envoyée où que ce soit.</p>
+      <div class="btn-row"><button class="btn secondary" onclick="confirmerReset()">Réinitialiser la progression</button></div>
+    </div>
+    <footer>DIGITAL MINDS — CORE LAB · Outil de compréhension, pas un examen.</footer>
+  `;
+}
+function confirmerReset(){
+  reinitialiserProgression();
+  renderAccueil();
+}
+
+// --- MODULE : déroulé question par question ---
+function demarrerModule(index){
+  const mod = MODULES[index];
+  const ms = ETAT_PROGRESSION.modules[mod.id];
+  const ordre = mod.questions.filter(q => !ms.correctEver[q.id]).map(q => q.id);
+  const ordreFinal = ordre.length ? ordre : mod.questions.map(q => q.id);
+  afficherEcran("module", { moduleIndex: index, ordre: ordreFinal, curseur: 0, dernierChoix: null });
+}
+function questionParId(mod, id){ return mod.questions.find(q => q.id === id); }
+
+function renderQuestionCourante(){
+  const mod = MODULES[ETAT.moduleIndex];
+  const qid = ETAT.ordre[ETAT.curseur];
+  const q = questionParId(mod, qid);
+  const choices = q.choix.map((c,i) => {
+    let cls = "choice";
+    if (ETAT.dernierChoix !== null){
+      cls += " disabled";
+      if (i === q.bonne) cls += " correct";
+      else if (i === ETAT.dernierChoix) cls += " incorrect";
+      else cls += " muted";
+    }
+    return `<div class="${cls}" onclick="${ETAT.dernierChoix===null?`repondre(${i})`:''}">${escapeHtml(c)}</div>`;
+  }).join("");
+
+  let feedbackHtml = "";
+  if (ETAT.dernierChoix !== null){
+    const correct = ETAT.dernierChoix === q.bonne;
+    feedbackHtml = `
+      <div class="feedback ${correct?'ok':'warn'}">
+        <strong>${correct ? "CORRECT" : "À REVOIR"}</strong><br>
+        ${escapeHtml(q.expl[ETAT.dernierChoix])}
+        ${!correct ? `<br><br><em>Bonne réponse :</em> ${escapeHtml(q.choix[q.bonne])} — ${escapeHtml(q.expl[q.bonne])}` : ""}
+      </div>
+      <div class="meta-tags">
+        <span class="meta-tag">Principe : ${escapeHtml(q.principe)}</span>
+        <span class="meta-tag">${escapeHtml(q.chapitre)}</span>
+      </div>
+      <div class="btn-row"><button class="btn" onclick="questionSuivante()">${ETAT.curseur < ETAT.ordre.length-1 ? "Question suivante" : "Voir le résumé du module"}</button></div>
+    `;
+  }
+
+  app.innerHTML = `
+    ${topbar(mod.nom)}
+    <div class="card">
+      <div class="qcounter">Question ${ETAT.curseur+1} / ${ETAT.ordre.length}</div>
+      <h2>${escapeHtml(q.enonce)}</h2>
+      <div class="choice-list">${choices}</div>
+      ${feedbackHtml}
+    </div>
+  `;
+}
+function repondre(index){
+  const mod = MODULES[ETAT.moduleIndex];
+  const qid = ETAT.ordre[ETAT.curseur];
+  const q = questionParId(mod, qid);
+  const ms = ETAT_PROGRESSION.modules[mod.id];
+  const correct = index === q.bonne;
+  if (ms.firstAttemptCorrect[q.id] === undefined){
+    ms.firstAttemptCorrect[q.id] = correct;
+  }
+  if (correct) ms.correctEver[q.id] = true;
+  sauvegarderProgression();
+  ETAT.dernierChoix = index;
+  renderQuestionCourante();
+}
+function questionSuivante(){
+  if (ETAT.curseur < ETAT.ordre.length - 1){
+    ETAT.curseur++;
+    ETAT.dernierChoix = null;
+    renderQuestionCourante();
+  } else {
+    renderResumeModule();
+  }
+}
+function renderResumeModule(){
+  const mod = MODULES[ETAT.moduleIndex];
+  const ms = ETAT_PROGRESSION.modules[mod.id];
+  const resultat = evaluerRonde(mod.questions, ms.correctEver);
+  ms.mastered = resultat.mastered;
+  sauvegarderProgression();
+
+  let corpsHtml;
+  if (resultat.mastered){
+    const estDernier = ETAT.moduleIndex === MODULES.length - 1;
+    corpsHtml = `
+      <div class="feedback ok"><strong>Module maîtrisé</strong> — ${resultat.nbCorrectes}/${resultat.total} bonnes réponses.</div>
+      ${estDernier ? `<p>Ce module comporte une dernière étape : un mini-cas de diagnostic.</p>
+        <div class="btn-row"><button class="btn" onclick="demarrerMiniCas()">Commencer le mini-cas</button></div>`
+      : `<div class="btn-row"><button class="btn" onclick="afficherEcran('accueil')">Module suivant débloqué →</button></div>`}
+    `;
+  } else {
+    corpsHtml = `
+      <div class="feedback warn">${resultat.nbCorrectes}/${resultat.total} bonnes réponses — pas encore de quoi maîtriser ce module.</div>
+      <p>Reprenons uniquement les questions à revoir.</p>
+      <div class="btn-row"><button class="btn" onclick="reprendreQuestionsRatees()">Reprendre les questions à revoir</button></div>
+    `;
+  }
+
+  app.innerHTML = `
+    ${topbar(mod.nom + " — Résumé")}
+    <div class="card">
+      <h2>${mod.nom}</h2>
+      ${corpsHtml}
+    </div>
+  `;
+}
+function reprendreQuestionsRatees(){
+  const mod = MODULES[ETAT.moduleIndex];
+  const ms = ETAT_PROGRESSION.modules[mod.id];
+  const resultat = evaluerRonde(mod.questions, ms.correctEver);
+  afficherEcran("module", { ordre: resultat.aRefaire, curseur:0, dernierChoix:null });
+}
+
+// --- MINI-CAS (fin du module DIAGNOSTIC) ---
+function demarrerMiniCas(){
+  const mod = MODULES.find(m => m.id === "diagnostic");
+  const ordre = mod.miniCas.items.map(it => it.id);
+  afficherEcran("miniCas", { miniCasOrdre: ordre, miniCasCurseur: 0, dernierChoix: null });
+}
+function itemMiniCasParId(mod, id){ return mod.miniCas.items.find(it => it.id === id); }
+
+function renderMiniCasCourant(){
+  const mod = MODULES.find(m => m.id === "diagnostic");
+  const id = ETAT.miniCasOrdre[ETAT.miniCasCurseur];
+  const item = itemMiniCasParId(mod, id);
+  const cats = mod.miniCas.categories;
+
+  const choices = cats.map((c,i) => {
+    let cls = "choice";
+    if (ETAT.dernierChoix !== null){
+      cls += " disabled";
+      if (i === item.bonne) cls += " correct";
+      else if (i === ETAT.dernierChoix) cls += " incorrect";
+      else cls += " muted";
+    }
+    return `<div class="${cls}" onclick="${ETAT.dernierChoix===null?`repondreMiniCas(${i})`:''}">${escapeHtml(c)}</div>`;
+  }).join("");
+
+  let feedbackHtml = "";
+  if (ETAT.dernierChoix !== null){
+    const correct = ETAT.dernierChoix === item.bonne;
+    feedbackHtml = `
+      <div class="feedback ${correct?'ok':'warn'}">
+        <strong>${correct ? "CORRECT" : "À REVOIR"}</strong><br>
+        Cette phrase illustre l'étape : <strong>${escapeHtml(cats[item.bonne])}</strong>.
+      </div>
+      <div class="btn-row"><button class="btn" onclick="miniCasSuivant()">${ETAT.miniCasCurseur < ETAT.miniCasOrdre.length-1 ? "Phrase suivante" : "Voir le résumé"}</button></div>
+    `;
+  }
+
+  app.innerHTML = `
+    ${topbar("DIAGNOSTIC — Mini-cas")}
+    <div class="card">
+      <p>${escapeHtml(mod.miniCas.intro)}</p>
+      <div class="qcounter">Phrase ${ETAT.miniCasCurseur+1} / ${ETAT.miniCasOrdre.length}</div>
+      <h2>${item.texte}</h2>
+      <div class="choice-list">${choices}</div>
+      ${feedbackHtml}
+    </div>
+  `;
+}
+function repondreMiniCas(index){
+  const mod = MODULES.find(m => m.id === "diagnostic");
+  const id = ETAT.miniCasOrdre[ETAT.miniCasCurseur];
+  if (!ETAT_PROGRESSION.miniCas) ETAT_PROGRESSION.miniCas = {};
+  ETAT_PROGRESSION.miniCas[id] = index;
+  sauvegarderProgression();
+  ETAT.dernierChoix = index;
+  renderMiniCasCourant();
+}
+function miniCasSuivant(){
+  if (ETAT.miniCasCurseur < ETAT.miniCasOrdre.length - 1){
+    ETAT.miniCasCurseur++;
+    ETAT.dernierChoix = null;
+    renderMiniCasCourant();
+  } else {
+    renderResumeMiniCas();
+  }
+}
+function renderResumeMiniCas(){
+  app.innerHTML = `
+    ${topbar("DIAGNOSTIC — Mini-cas terminé")}
+    <div class="card">
+      <div class="feedback ok"><strong>Mini-cas terminé.</strong> Tu as classé chaque phrase selon l'étape de la méthode qu'elle illustre.</div>
+      <div class="btn-row"><button class="btn" onclick="afficherEcran('bilanFinal')">Voir le bilan final</button></div>
+    </div>
+  `;
+}
+
+// --- BILAN FINAL ---
+function renderBilanFinal(){
+  const bilan = calculerBilanFinal(MODULES, ETAT_PROGRESSION);
+  const listeModules = bilan.modulesMaitrises.map(n => `<span class="meta-tag">${escapeHtml(n)}</span>`).join(" ") || "—";
+  const listePrincipes = bilan.principesMaitrisesPremierEssai.map(p => `<span class="meta-tag">${escapeHtml(p)}</span>`).join(" ") || "—";
+  const listeChapitres = bilan.chapitresARevoir.map(c => `<span class="meta-tag">${escapeHtml(c)}</span>`).join(" ") || "Aucun — bien joué.";
+
+  app.innerHTML = `
+    ${topbar("Bilan final")}
+    <div class="card center">
+      <h1>Tu as terminé CORE LAB</h1>
+      <p>Score global : <strong>${bilan.scoreGlobal} / ${bilan.totalQuestions}</strong></p>
+    </div>
+    <div class="card">
+      <h3>Modules maîtrisés</h3>
+      <div class="meta-tags">${listeModules}</div>
+    </div>
+    <div class="card">
+      <h3>Principes les mieux maîtrisés (réussis du premier coup)</h3>
+      <div class="meta-tags">${listePrincipes}</div>
+    </div>
+    <div class="card">
+      <h3>Chapitres à revoir si tu veux consolider</h3>
+      <div class="meta-tags">${listeChapitres}</div>
+    </div>
+    <div class="card">
+      <p class="small">CORE LAB est un outil de compréhension, pas un examen : ce bilan sert à te montrer où revenir si tu le souhaites, pas à te juger.</p>
+      <div class="btn-row"><button class="btn secondary" onclick="confirmerReset()">Recommencer</button></div>
+    </div>
+  `;
+}
+
+/* =========================================================
+   6. ÉVÉNEMENTS
+   ========================================================= */
+document.addEventListener("DOMContentLoaded", function(){ afficherEcran("accueil"); });
+</script>
+</body>
+</html>
