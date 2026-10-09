@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>DIGITAL MINDS 03 — CORE LAB</title>
+<style>
+  :root{
+    --bg:#080D2A;
+    --bg-panel:#101A45;
+    --bg-panel-2:#152155;
+    --border:#243061;
+    --text:#F2F4F9;
+    --text-dim:#AEB7D1;
+    --blue:#246BFD;
+    --blue-dark:#1B4FC2;
+    --blue-tint:rgba(36,107,253,.14);
+    --green:#35D18A;
+    --green-tint:rgba(53,209,138,.14);
+    --amber:#FFB84D;
+    --amber-tint:rgba(255,184,77,.14);
+    --radius:14px;
+    --maxw:760px;
+    font-size:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:radial-gradient(circle at 20% 0%, #0F1C4D 0%, var(--bg) 55%);
+    color:var(--text);
+    font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    min-height:100vh;
+    line-height:1.5;
+  }
+  #app{ max-width:var(--maxw); margin:0 auto; padding:20px 16px 60px; }
+  .eyebrow{ letter-spacing:.14em; text-transform:uppercase; font-size:.75rem; color:var(--text-dim); font-weight:600; }
+  h1{font-size:1.8rem;margin:.2em 0 .1em;}
+  h2{font-size:1.25rem;margin:1.2em 0 .5em;}
+  h3{font-size:1.02rem;margin:.9em 0 .4em;color:var(--text);}
+  p{color:var(--text-dim);}
+  .card{ background:var(--bg-panel); border:1px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:14px; }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    min-height:52px; padding:12px 20px; border-radius:12px;
+    border:1px solid var(--blue); background:var(--blue); color:#fff;
+    font-size:1rem; font-weight:600; cursor:pointer; width:100%; text-align:center;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .btn:active{transform:scale(.98);}
+  .btn.secondary{ background:transparent; color:var(--text); border:1px solid var(--border); }
+  .btn.ghost{ background:transparent; color:var(--blue); border:1px solid var(--blue); }
+  .btn:disabled{opacity:.4;cursor:not-allowed;}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
+  .btn-row .btn{flex:1 1 140px;}
+  .btn.small{min-height:44px;padding:8px 14px;font-size:.85rem;width:auto;flex:0 0 auto;}
+  .btn.active{background:var(--blue);border-color:var(--blue);color:#fff;}
+
+  .door{ display:flex; align-items:center; justify-content:space-between; gap:12px; cursor:pointer; text-align:left; }
+  .door .meta{color:var(--text-dim);font-size:.85rem;margin-top:2px;}
+  .door .arrow{font-size:1.3rem;color:var(--blue);flex-shrink:0;}
+  .pill{ display:inline-block; font-size:.7rem; text-transform:uppercase; letter-spacing:.06em; padding:3px 9px; border-radius:999px; border:1px solid var(--border); color:var(--text-dim); }
+  .pill.vu{ color:var(--green); border-color:rgba(53,209,138,.5); }
+
+  .progress-track{ background:var(--bg-panel-2); border-radius:999px; height:10px; overflow:hidden; margin:8px 0 4px; }
+  .progress-fill{ background:linear-gradient(90deg,var(--blue),var(--green)); height:100%; width:0%; transition:width .4s ease; }
+  .progress-label{font-size:.8rem;color:var(--text-dim);}
+
+  .topbar{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .backlink{ color:var(--text-dim); background:none; border:none; font-size:.95rem; cursor:pointer; padding:8px 0; min-height:44px; }
+
+  .feedback{ border-radius:10px; padding:14px; margin-top:12px; font-size:.92rem; }
+  .feedback.info{background:var(--blue-tint);color:#cfe0ff;border:1px solid rgba(36,107,253,.4);}
+  .feedback.note{background:var(--amber-tint);color:#ffd9a0;border:1px solid rgba(255,184,77,.4);}
+  .feedback.calme{background:var(--green-tint);color:#bdf2d8;border:1px solid rgba(53,209,138,.4);}
+  .meta-tags{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
+  .meta-tag{font-size:.72rem; padding:3px 9px; border-radius:999px; background:var(--bg-panel-2); border:1px solid var(--border); color:var(--text-dim);}
+
+  .choice-list{display:flex;flex-direction:column;gap:8px;margin:12px 0;}
+  .choice{ background:var(--bg-panel-2); border:1px solid var(--border); border-radius:10px; padding:14px; cursor:pointer; min-height:48px; display:flex; align-items:center; font-size:.95rem; }
+  .choice.selected{border-color:var(--blue); background:var(--blue-tint);}
+  .choice.explored{opacity:.7;}
+
+  .badge{ display:inline-block; font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; padding:3px 8px; border-radius:999px; background:var(--bg-panel-2); color:var(--text-dim); border:1px solid var(--border); }
+  .hidden{display:none !important;}
+  .center{text-align:center;}
+  .small{font-size:.82rem;color:var(--text-dim);}
+  hr{border:none;border-top:1px solid var(--border);margin:20px 0;}
+  footer{margin-top:40px;text-align:center;color:var(--text-dim);font-size:.78rem;}
+
+  .cycle-stages{display:flex;gap:8px;margin:14px 0;}
+  .cycle-stage{flex:1;text-align:center;padding:14px 6px;border-radius:10px;background:var(--bg-panel-2);border:1px solid var(--border);font-size:.82rem;color:var(--text-dim);}
+  .cycle-stage.active{background:var(--blue-tint);border-color:var(--blue);color:#cfe0ff;font-weight:700;}
+
+  .mem-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:14px 0;}
+  .mem-slot{aspect-ratio:1;border-radius:8px;background:var(--bg-panel-2);border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:.68rem;text-align:center;padding:2px;color:var(--text-dim);}
+  .mem-slot.filled{background:var(--blue-tint);border:1px solid var(--blue);color:var(--text);border-style:solid;}
+
+  .item-list{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;}
+  .item-btn{background:var(--bg-panel-2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:.85rem;cursor:pointer;color:var(--text);}
+  .item-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+  .proc-bar-wrap{margin:10px 0;}
+  .proc-bar-track{background:var(--bg-panel-2);border-radius:8px;height:22px;overflow:hidden;border:1px solid var(--border);}
+  .proc-bar-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--green));width:0%;transition:width .2s ease;}
+
+  .slider-row{margin:14px 0;}
+  .slider-row input[type=range]{width:100%;}
+  .slider-label{display:flex;justify-content:space-between;font-size:.85rem;color:var(--text-dim);margin-bottom:4px;}
+
+  .sysmap{display:flex;flex-direction:column;gap:8px;margin:14px 0;}
+  .sysnode{background:var(--bg-panel-2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;font-size:.9rem;}
+  .sysnode.selected{border-color:var(--blue);background:var(--blue-tint);}
+
+  @media (min-width:600px){ :root{font-size:17px;} }
+</style>
+</head>
+<body>
+<div id="app" role="main"></div>
+
+<script>
+/* =========================================================
+   DIGITAL MINDS 03 — CORE LAB
+   « Entre dans la salle des machines. »
+   Fichier HTML autonome — HTML + CSS + JavaScript vanilla.
+   Aucune dépendance externe, aucun compte, aucune collecte
+   de données. La progression (modules explorés) est
+   conservée uniquement dans le navigateur (localStorage),
+   avec repli silencieux en mémoire si indisponible.
+
+   PRINCIPE : ce laboratoire n'est pas un quiz. Il n'existe
+   aucune bonne ou mauvaise réponse, aucun score, aucun
+   verrouillage. Chaque module permet de manipuler un modèle
+   simplifié et d'observer ce que cette manipulation
+   provoque — exactement ce que le livre DIGITAL MINDS 03 —
+   CORE explique en théorie, chapitre par chapitre.
+   ========================================================= */
+
+/* =========================================================
+   1. CONFIGURATION
+   ========================================================= */
+const CONFIG = {
+  titre: "DIGITAL MINDS 03",
+  sousTitre: "CORE LAB",
+  accroche: "Entre dans la salle des machines.",
+  cleStockage: "core-lab-exploration-v1",
+};
+
+/* =========================================================
+   2. DONNÉES DES MODULES (descriptif — aucune notion de score)
+   ========================================================= */
+const MODULES = [
+  { id:"cpu", nom:"CPU", resume:"Cycle chercher → décoder → exécuter", chapitre:"Chapitre 4" },
+  { id:"memory", nom:"MEMORY", resume:"Mémoire de travail à capacité limitée", chapitre:"Chapitre 5" },
+  { id:"storage", nom:"STORAGE", resume:"Persistance : ce qui survit, ce qui disparaît", chapitre:"Chapitre 6" },
+  { id:"system", nom:"SYSTEM", resume:"Arbitrage du système d'exploitation", chapitre:"Chapitre 8" },
+  { id:"processes", nom:"PROCESSES", resume:"Alternance et parallélisme", chapitre:"Chapitre 10" },
+  { id:"performance", nom:"PERFORMANCE", resume:"Observer au repos, puis sous charge", chapitre:"Chapitres 11-12" },
+  { id:"diagnostic", nom:"DIAGNOSTIC", resume:"Symptôme → hypothèse → test → résultat", chapitre:"Chapitre 13" },
+];
+
+/* =========================================================
+   3. DONNÉES DE MANIPULATION PAR MODULE
+   ========================================================= */
+
+// --- CPU : cycle chercher -> décoder -> exécuter sur des instructions jouets ---
+const CPU_PROGRAMME = [
+  { texte: "CHARGER 5 dans A", effet: (etat) => ({ ...etat, A: 5 }) },
+  { texte: "CHARGER 3 dans B", effet: (etat) => ({ ...etat, B: 3 }) },
+  { texte: "ADDITIONNER A et B -> R", effet: (etat) => ({ ...etat, R: (etat.A||0) + (etat.B||0) }) },
+  { texte: "AFFICHER R", effet: (etat) => ({ ...etat }) },
+];
+const CPU_ETAPES = ["CHERCHER", "DÉCODER", "EXÉCUTER"];
+
+// --- MEMORY : espace de travail à capacité fixe (éviction FIFO) ---
+const MEMORY_CAPACITE = 6;
+const MEMORY_ELEMENTS = [
+  { id: "photo", nom: "Photo en cours d'édition", taille: 2 },
+  { id: "doc", nom: "Document en cours de rédaction", taille: 1 },
+  { id: "onglet1", nom: "Onglet navigateur A", taille: 1 },
+  { id: "onglet2", nom: "Onglet navigateur B", taille: 1 },
+  { id: "video", nom: "Vidéo en cours de lecture", taille: 3 },
+  { id: "jeu", nom: "Application de jeu", taille: 2 },
+];
+
+// --- PROCESSES : alternance rapide entre tâches (round-robin simplifié) ---
+const PROCESSES_DUREE_TOTALE = 12;
+
+// --- SYSTEM : carte des interactions ---
+const SYSTEM_NOEUDS = [
+  { id: "programme", nom: "Programme", lien: "Un programme accède généralement aux ressources à travers les interfaces fournies par le système d'exploitation, plutôt qu'en s'adressant directement au matériel." },
+  { id: "os", nom: "Système d'exploitation", lien: "Le système d'exploitation coordonne l'accès de tous les programmes au processeur, à la mémoire, au stockage, et leur fournit les services dont ils ont besoin." },
+  { id: "cpu", nom: "Processeur (CPU)", lien: "Le processeur exécute les instructions que le système d'exploitation lui transmet, à tour de rôle entre les programmes." },
+  { id: "ram", nom: "Mémoire de travail (RAM)", lien: "La mémoire de travail est allouée par le système d'exploitation à chaque programme actif, dans la limite de sa capacité." },
+  { id: "disque", nom: "Stockage", lien: "Le stockage est sollicité par le système d'exploitation chaque fois qu'un programme doit lire ou écrire durablement." },
+];
+
+// --- DIAGNOSTIC : cas explorables, sans hypothèse "correcte" imposée ---
+const DIAGNOSTIC_CAS = [
+  {
+    id: "cas1",
+    symptome: "La machine ralentit fortement dès qu'on ouvre un gros fichier vidéo.",
+    hypotheses: [
+      {
+        id: "h1a", texte: "La mémoire de travail est saturée par le fichier vidéo.",
+        test: "Observer la mémoire de travail juste avant et pendant l'ouverture du fichier.",
+        resultat: "La mémoire de travail atteint sa limite exactement au moment de l'ouverture.",
+        diagnostic: "Cette piste est cohérente avec ce qui est observé : la mémoire de travail semble bien en cause ici.",
+      },
+      {
+        id: "h1b", texte: "Le stockage est physiquement endommagé.",
+        test: "Vérifier si d'autres opérations de lecture ou d'écriture sur le stockage posent aussi problème.",
+        resultat: "Les autres opérations de stockage se déroulent normalement.",
+        diagnostic: "Cette piste n'est pas confirmée par le test : le stockage ne semble pas en cause ici.",
+      },
+    ],
+  },
+  {
+    id: "cas2",
+    symptome: "Un seul jeu vidéo précis rame, alors que tout le reste de la machine reste fluide.",
+    hypotheses: [
+      {
+        id: "h2a", texte: "Toute la machine est en panne générale.",
+        test: "Observer le processeur pendant d'autres tâches, légères, en dehors du jeu.",
+        resultat: "Le processeur reste parfaitement fluide sur les autres tâches.",
+        diagnostic: "Cette piste ne tient pas : une panne générale toucherait aussi les autres tâches.",
+      },
+      {
+        id: "h2b", texte: "Le processeur atteint sa limite uniquement pour ce jeu exigeant.",
+        test: "Observer le processeur spécifiquement pendant ce jeu.",
+        resultat: "Le processeur atteint un niveau très élevé uniquement pendant ce jeu.",
+        diagnostic: "Cette piste est cohérente avec l'observation : la charge de ce jeu précis semble en cause.",
+      },
+    ],
+  },
+  {
+    id: "cas3",
+    symptome: "La machine ralentit progressivement au fil d'une longue session, sur plusieurs tâches différentes.",
+    hypotheses: [
+      {
+        id: "h3a", texte: "Une seule cause simple explique tout.",
+        test: "Chercher une seule ressource qui expliquerait à elle seule tout le ralentissement.",
+        resultat: "Aucune ressource isolée ne semble expliquer, à elle seule, tout le phénomène.",
+        diagnostic: "Cette piste reste incomplète : une cause unique ne suffit pas à tout expliquer ici.",
+      },
+      {
+        id: "h3b", texte: "Plusieurs ressources contribuent ensemble (mémoire qui s'accumule, stockage qui se remplit).",
+        test: "Observer la mémoire et le stockage à intervalles réguliers sur toute la session.",
+        resultat: "La mémoire augmente progressivement sans jamais redescendre complètement entre les tâches.",
+        diagnostic: "Cette piste est cohérente avec l'observation — avec un niveau de confiance modéré : un diagnostic purement logiciel ne permet pas d'exclure totalement d'autres facteurs.",
+      },
+    ],
+  },
+];
+
+/* =========================================================
+   4. LOGIQUE DE MANIPULATION (fonctions pures, testables isolément)
+   ========================================================= */
+
+function cpuEtapeSuivante(instructionIndex, etapeIndex, etatCalcul){
+  let nextEtape = etapeIndex + 1;
+  let nextInstruction = instructionIndex;
+  let nouvelEtat = etatCalcul;
+  if (nextEtape >= CPU_ETAPES.length){
+    if (CPU_PROGRAMME[instructionIndex]){
+      nouvelEtat = CPU_PROGRAMME[instructionIndex].effet(etatCalcul);
+    }
+    nextEtape = 0;
+    nextInstruction = instructionIndex + 1;
+  }
+  return { instructionIndex: nextInstruction, etapeIndex: nextEtape, etatCalcul: nouvelEtat };
+}
+
+function memoryAjouter(occupation, element){
+  let nouvelle = occupation.slice();
+  nouvelle.push(element);
+  const evinces = [];
+  let total = nouvelle.reduce((s,e)=>s+e.taille,0);
+  while (total > MEMORY_CAPACITE && nouvelle.length > 1){
+    const retire = nouvelle.shift();
+    evinces.push(retire);
+    total = nouvelle.reduce((s,e)=>s+e.taille,0);
+  }
+  return { occupation: nouvelle, evinces, total };
+}
+
+function storageEteindre(memoireActuelle, storageActuel){
+  return { memoire: [], storage: storageActuel.slice() };
+}
+
+function processesAvancer(taches){
+  const enCours = taches.filter(t => t.progression < PROCESSES_DUREE_TOTALE);
+  if (enCours.length === 0) return taches;
+  let cible = enCours[0];
+  enCours.forEach(t => { if (t.progression < cible.progression) cible = t; });
+  return taches.map(t => t.id === cible.id ? { ...t, progression: Math.min(PROCESSES_DUREE_TOTALE, t.progression + 1) } : t);
+}
+
+function calculerFluidite(cpu, mem, disque){
+  const pire = Math.max(cpu, mem, disque);
+  return Math.max(0, 100 - pire);
+}
+function ressourceGoulot(cpu, mem, disque){
+  const valeurs = { CPU: cpu, "Mémoire": mem, "Stockage": disque };
+  let pire = "CPU", max = -1;
+  Object.keys(valeurs).forEach(k => { if (valeurs[k] > max){ max = valeurs[k]; pire = k; } });
+  return { nom: pire, valeur: max };
+}
+
+/* =========================================================
+   5. PROGRESSION D'EXPLORATION (pas de score, pas de verrou)
+   ========================================================= */
+function etatInitial(){
+  const explored = {};
+  const derniereObservation = {};
+  MODULES.forEach(m => { explored[m.id] = false; derniereObservation[m.id] = ""; });
+  return { explored, derniereObservation };
+}
+let PROGRESSION = chargerProgression();
+
+function chargerProgression(){
+  try{
+    const brut = window.localStorage.getItem(CONFIG.cleStockage);
+    if (!brut) return etatInitial();
+    const data = JSON.parse(brut);
+    if (!data || !data.explored) return etatInitial();
+    return data;
+  }catch(e){ return etatInitial(); }
+}
+function sauvegarderProgression(){
+  try{ window.localStorage.setItem(CONFIG.cleStockage, JSON.stringify(PROGRESSION)); }
+  catch(e){ /* stockage indisponible : l'exploration continue simplement sans persistance */ }
+}
+function marquerExplore(moduleId, observation){
+  PROGRESSION.explored[moduleId] = true;
+  if (observation) PROGRESSION.derniereObservation[moduleId] = observation;
+  sauvegarderProgression();
+}
+function nombreModulesExplores(){
+  return MODULES.filter(m => PROGRESSION.explored[m.id]).length;
+}
+function reinitialiserExploration(){
+  PROGRESSION = etatInitial();
+  sauvegarderProgression();
+}
+
+/* =========================================================
+   6. AFFICHAGE
+   ========================================================= */
+const app = document.getElementById("app");
+const ETAT = {
+  ecran: "accueil",
+  cpu: { instructionIndex: 0, etapeIndex: 0, etatCalcul: {} },
+  memory: { occupation: [] },
+  storage: { memoire: [], storage: [] },
+  processes: { taches: [
+    { id:"t1", nom:"Navigateur", progression:0 },
+    { id:"t2", nom:"Lecteur audio", progression:0 },
+  ]},
+  performance: { cpu:20, mem:20, disque:20 },
+  system: { selection: null },
+  diagnostic: { casIndex:0, hypotheseSelectionnee:null, etape:0 }, // etape: 0 symptome,1 hyp choisie,2 resultat,3 diagnostic
+};
+
+function afficherEcran(nom){
+  ETAT.ecran = nom;
+  window.scrollTo(0,0);
+  switch(nom){
+    case "accueil": return renderAccueil();
+    case "cpu": return renderCpu();
+    case "memory": return renderMemory();
+    case "storage": return renderStorage();
+    case "system": return renderSystem();
+    case "processes": return renderProcesses();
+    case "performance": return renderPerformance();
+    case "diagnostic": return renderDiagnostic();
+    case "bilan": return renderBilan();
+    default: return renderAccueil();
+  }
+}
+function topbar(titreEcran){
+  return `<div class="topbar">
+    <button class="backlink" onclick="afficherEcran('accueil')">← Accueil</button>
+    <span class="badge">${titreEcran}</span>
+  </div>`;
+}
+function escapeHtml(str){
+  return String(str).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+}
+
+// --- ACCUEIL : les 7 modules, tous accessibles d'emblée ---
+function renderAccueil(){
+  const nbExplores = nombreModulesExplores();
+  const portes = MODULES.map(mod => {
+    const vu = PROGRESSION.explored[mod.id];
+    return `
+      <div class="card door" onclick="afficherEcran('${mod.id}')">
+        <div>
+          <h3>${mod.nom}</h3>
+          <div class="meta">${mod.resume}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="pill ${vu?'vu':''}">${vu?'Déjà exploré':'À explorer'}</span>
+          <span class="arrow">→</span>
+        </div>
+      </div>`;
+  }).join("");
+
+  app.innerHTML = `
+    <div class="center">
+      <div class="eyebrow">${CONFIG.titre}</div>
+      <h1>${CONFIG.sousTitre}</h1>
+      <p>${CONFIG.accroche}</p>
+    </div>
+    <div class="card">
+      <div class="progress-label">${nbExplores} / ${MODULES.length} modules explorés</div>
+      <div class="progress-track"><div class="progress-fill" style="width:${Math.round(100*nbExplores/MODULES.length)}%"></div></div>
+      <p class="small">Aucun ordre imposé : commence par le module qui t'intéresse. Chaque module reste accessible à tout moment, exploré ou non.</p>
+    </div>
+    ${portes}
+    ${nbExplores === MODULES.length ? `<div class="btn-row"><button class="btn" onclick="afficherEcran('bilan')">Voir le bilan d'exploration</button></div>` : ""}
+    <div class="card">
+      <p class="small">Ta progression est conservée uniquement dans ce navigateur. Aucune donnée n'est envoyée où que ce soit.</p>
+      <div class="btn-row"><button class="btn secondary" onclick="reinitialiserExploration(); renderAccueil();">Réinitialiser mon exploration</button></div>
+    </div>
+    <footer>DIGITAL MINDS — CORE LAB · Un espace pour observer et manipuler, pas pour réussir.</footer>
+  `;
+}
+
+// --- CPU ---
+function renderCpu(){
+  const { instructionIndex, etapeIndex, etatCalcul } = ETAT.cpu;
+  const termine = instructionIndex >= CPU_PROGRAMME.length;
+  const instructionActuelle = termine ? null : CPU_PROGRAMME[instructionIndex];
+  const stages = CPU_ETAPES.map((nom, i) => `<div class="cycle-stage ${!termine && i===etapeIndex ? 'active' : ''}">${nom}</div>`).join("");
+
+  app.innerHTML = `
+    ${topbar("CPU")}
+    <div class="card">
+      <h2>Fais avancer le cycle, étape par étape</h2>
+      <p class="small">Modèle pédagogique volontairement simplifié — il illustre un principe, pas le fonctionnement exact d'un processeur réel.</p>
+      <p>Programme jouet : ${CPU_PROGRAMME.map(i=>i.texte).join(" · ")}</p>
+      <div class="cycle-stages">${stages}</div>
+      <p><strong>Instruction en cours :</strong> ${termine ? "programme terminé" : instructionActuelle.texte}</p>
+      <div class="small">État observé : A = ${etatCalcul.A ?? "—"} · B = ${etatCalcul.B ?? "—"} · R = ${etatCalcul.R ?? "—"}</div>
+      <div class="btn-row">
+        <button class="btn" onclick="cpuSuivant()" ${termine?"disabled":""}>Avancer d'un pas</button>
+        <button class="btn secondary" onclick="cpuRejouer()">Rejouer depuis le début</button>
+      </div>
+      <div id="feedback-cpu"></div>
+    </div>
+  `;
+  if (termine){
+    document.getElementById("feedback-cpu").innerHTML = `<div class="feedback calme">Le programme est allé au bout : R = ${etatCalcul.R}. Tu viens de faire avancer, toi-même, le cycle chercher → décoder → exécuter une fois par instruction.</div>`;
+  }
+}
+function cpuSuivant(){
+  const { instructionIndex, etapeIndex, etatCalcul } = ETAT.cpu;
+  if (instructionIndex >= CPU_PROGRAMME.length) return;
+  ETAT.cpu = cpuEtapeSuivante(instructionIndex, etapeIndex, etatCalcul);
+  marquerExplore("cpu", `Étape observée : instruction ${Math.min(ETAT.cpu.instructionIndex+1, CPU_PROGRAMME.length)}/${CPU_PROGRAMME.length}.`);
+  renderCpu();
+}
+function cpuRejouer(){
+  ETAT.cpu = { instructionIndex: 0, etapeIndex: 0, etatCalcul: {} };
+  renderCpu();
+}
+
+// --- MEMORY ---
+function renderMemory(){
+  const { occupation } = ETAT.memory;
+  const totalOccupe = occupation.reduce((s,e)=>s+e.taille,0);
+  const slots = [];
+  occupation.forEach(el => { for(let i=0;i<el.taille;i++) slots.push(el.nom); });
+  while (slots.length < MEMORY_CAPACITE) slots.push(null);
+  const slotsHtml = slots.slice(0, MEMORY_CAPACITE).map(s => `<div class="mem-slot ${s?'filled':''}">${s?s:''}</div>`).join("");
+  const boutons = MEMORY_ELEMENTS.map(el => `<button class="item-btn" onclick="memoryAjouterElement('${el.id}')">${el.nom} (${el.taille})</button>`).join("");
+
+  app.innerHTML = `
+    ${topbar("MEMORY")}
+    <div class="card">
+      <h2>Observe un espace de travail à taille limitée</h2>
+      <p class="small">Modèle pédagogique volontairement simplifié.</p>
+      <p>Capacité totale : ${MEMORY_CAPACITE} unités. Occupation actuelle : ${totalOccupe}/${MEMORY_CAPACITE}.</p>
+      <div class="mem-grid">${slotsHtml}</div>
+      <h3>Ajouter un élément en mémoire</h3>
+      <div class="item-list">${boutons}</div>
+      <div class="btn-row"><button class="btn secondary" onclick="memoryRejouer()">Vider et recommencer</button></div>
+      <div id="feedback-memory"></div>
+    </div>
+  `;
+}
+function memoryAjouterElement(id){
+  const element = MEMORY_ELEMENTS.find(e => e.id === id);
+  const resultat = memoryAjouter(ETAT.memory.occupation, element);
+  ETAT.memory.occupation = resultat.occupation;
+  renderMemory();
+  const zone = document.getElementById("feedback-memory");
+  if (resultat.evinces.length){
+    zone.innerHTML = `<div class="feedback note">Espace insuffisant : ${resultat.evinces.map(e=>e.nom).join(", ")} a été retiré de la mémoire de travail pour faire de la place — exactement l'arbitrage qu'un système réel effectue en permanence.</div>`;
+    marquerExplore("memory", `Éviction observée après ajout de « ${element.nom} ».`);
+  } else {
+    zone.innerHTML = `<div class="feedback info">Ajouté sans contrainte — il reste ${MEMORY_CAPACITE - resultat.total} unité(s) disponible(s).</div>`;
+    marquerExplore("memory", `« ${element.nom} » ajouté sans contrainte.`);
+  }
+}
+function memoryRejouer(){ ETAT.memory.occupation = []; renderMemory(); }
+
+// --- STORAGE ---
+function renderStorage(){
+  const { memoire, storage } = ETAT.storage;
+  app.innerHTML = `
+    ${topbar("STORAGE")}
+    <div class="card">
+      <h2>Observe ce qui survit, ce qui disparaît</h2>
+      <p class="small">Modèle pédagogique volontairement simplifié.</p>
+      <p>Crée un brouillon en mémoire de travail, choisis de l'enregistrer ou non, puis éteins la machine pour observer ce qui reste.</p>
+      <div class="btn-row"><button class="btn" onclick="storageAjouterBrouillon()">Créer un brouillon (en mémoire)</button></div>
+      <h3>Mémoire de travail (volatile)</h3>
+      <p class="small">${memoire.length ? memoire.join(", ") : "(vide)"}</p>
+      <h3>Stockage durable</h3>
+      <p class="small">${storage.length ? storage.join(", ") : "(vide)"}</p>
+      <div class="btn-row">
+        <button class="btn secondary" onclick="storageEnregistrer()" ${memoire.length?"":"disabled"}>Enregistrer le brouillon</button>
+        <button class="btn ghost" onclick="storageEteindreAction()">Éteindre / Rallumer</button>
+      </div>
+      <div id="feedback-storage"></div>
+    </div>
+  `;
+}
+function storageAjouterBrouillon(){
+  ETAT.storage.memoire.push("Brouillon " + (ETAT.storage.memoire.length + ETAT.storage.storage.length + 1));
+  renderStorage();
+}
+function storageEnregistrer(){
+  ETAT.storage.storage = ETAT.storage.storage.concat(ETAT.storage.memoire);
+  ETAT.storage.memoire = [];
+  renderStorage();
+  document.getElementById("feedback-storage").innerHTML = `<div class="feedback calme">Enregistré : ce contenu est maintenant dans le stockage durable, il survivra à une extinction.</div>`;
+  marquerExplore("storage", "Un brouillon a été enregistré avant extinction.");
+}
+function storageEteindreAction(){
+  const perdu = ETAT.storage.memoire.length;
+  const resultat = storageEteindre(ETAT.storage.memoire, ETAT.storage.storage);
+  ETAT.storage = resultat;
+  renderStorage();
+  const zone = document.getElementById("feedback-storage");
+  if (perdu > 0){
+    zone.innerHTML = `<div class="feedback note">${perdu} brouillon(s) non enregistré(s) ont disparu à l'extinction — la mémoire de travail est volatile. Le contenu déjà enregistré, lui, a survécu.</div>`;
+    marquerExplore("storage", `${perdu} brouillon(s) perdu(s) à l'extinction (non enregistré(s)).`);
+  } else {
+    zone.innerHTML = `<div class="feedback calme">Rien n'a été perdu : tout ce qui existait avant l'extinction était déjà enregistré dans le stockage durable.</div>`;
+    marquerExplore("storage", "Extinction observée sans perte (tout était déjà enregistré).");
+  }
+}
+
+// --- SYSTEM ---
+function renderSystem(){
+  const { selection } = ETAT.system;
+  const noeuds = SYSTEM_NOEUDS.map(n => `<div class="sysnode ${selection===n.id?'selected':''}" onclick="systemSelectionner('${n.id}')">${n.nom}</div>`).join("");
+  const noeudActif = SYSTEM_NOEUDS.find(n => n.id === selection);
+
+  app.innerHTML = `
+    ${topbar("SYSTEM")}
+    <div class="card">
+      <h2>Observe qui parle à qui</h2>
+      <p class="small">Modèle pédagogique volontairement simplifié.</p>
+      <p>Touche un élément pour observer ses liens réels avec les autres.</p>
+      <div class="sysmap">${noeuds}</div>
+      <div id="feedback-system">${noeudActif ? `<div class="feedback info">${noeudActif.lien}</div>` : ""}</div>
+    </div>
+  `;
+}
+function systemSelectionner(id){
+  ETAT.system.selection = id;
+  const n = SYSTEM_NOEUDS.find(x=>x.id===id);
+  marquerExplore("system", `Lien observé : ${n.nom}.`);
+  renderSystem();
+}
+
+// --- PROCESSES ---
+function renderProcesses(){
+  const { taches } = ETAT.processes;
+  const tousTermines = taches.every(t => t.progression >= PROCESSES_DUREE_TOTALE);
+  const barres = taches.map(t => `
+    <div class="proc-bar-wrap">
+      <div class="small">${t.nom} — ${t.progression}/${PROCESSES_DUREE_TOTALE}</div>
+      <div class="proc-bar-track"><div class="proc-bar-fill" style="width:${(t.progression/PROCESSES_DUREE_TOTALE)*100}%"></div></div>
+    </div>`).join("");
+
+  app.innerHTML = `
+    ${topbar("PROCESSES")}
+    <div class="card">
+      <h2>Observe l'alternance entre plusieurs tâches</h2>
+      <p class="small">Modèle pédagogique volontairement simplifié.</p>
+      <p>Chaque pas fait avancer une seule tâche à la fois — celle qui a le moins avancé jusqu'ici.</p>
+      ${barres}
+      <div class="btn-row">
+        <button class="btn" onclick="processesAvancerAction()" ${tousTermines?"disabled":""}>Avancer d'un pas</button>
+        <button class="btn secondary" onclick="processesAjouterTache()">Ajouter une tâche</button>
+        <button class="btn ghost" onclick="processesRejouer()">Rejouer</button>
+      </div>
+      <div id="feedback-processes"></div>
+    </div>
+  `;
+  if (tousTermines){
+    document.getElementById("feedback-processes").innerHTML = `<div class="feedback calme">Toutes les tâches sont allées au bout. Remarque : plus tu ajoutes de tâches avant de relancer, plus chacune prend de pas pour se terminer — c'est l'alternance qui répartit le temps.</div>`;
+  }
+}
+function processesAvancerAction(){
+  ETAT.processes.taches = processesAvancer(ETAT.processes.taches);
+  marquerExplore("processes", "Alternance observée entre plusieurs tâches.");
+  renderProcesses();
+}
+function processesAjouterTache(){
+  const n = ETAT.processes.taches.length + 1;
+  ETAT.processes.taches.push({ id:"t"+n, nom:"Tâche "+n, progression:0 });
+  renderProcesses();
+}
+function processesRejouer(){
+  ETAT.processes.taches = [
+    { id:"t1", nom:"Navigateur", progression:0 },
+    { id:"t2", nom:"Lecteur audio", progression:0 },
+  ];
+  renderProcesses();
+}
+
+// --- PERFORMANCE ---
+function renderPerformance(){
+  const { cpu, mem, disque } = ETAT.performance;
+  const fluidite = calculerFluidite(cpu, mem, disque);
+  const goulot = ressourceGoulot(cpu, mem, disque);
+  app.innerHTML = `
+    ${topbar("PERFORMANCE")}
+    <div class="card">
+      <h2>Compare un état au repos et un état sous charge</h2>
+      <p class="small">Modèle pédagogique volontairement simplifié.</p>
+      <div class="slider-row">
+        <div class="slider-label"><span>Charge processeur</span><span>${cpu}%</span></div>
+        <input type="range" min="0" max="100" value="${cpu}" oninput="performanceMaj('cpu', this.value)">
+      </div>
+      <div class="slider-row">
+        <div class="slider-label"><span>Charge mémoire</span><span>${mem}%</span></div>
+        <input type="range" min="0" max="100" value="${mem}" oninput="performanceMaj('mem', this.value)">
+      </div>
+      <div class="slider-row">
+        <div class="slider-label"><span>Charge stockage</span><span>${disque}%</span></div>
+        <input type="range" min="0" max="100" value="${disque}" oninput="performanceMaj('disque', this.value)">
+      </div>
+      <div class="feedback info">
+        Fluidité observée : <strong>${fluidite}%</strong><br>
+        Ressource la plus sollicitée en ce moment : <strong>${goulot.nom}</strong> (${goulot.valeur}%)
+      </div>
+    </div>
+  `;
+}
+function performanceMaj(cle, valeur){
+  ETAT.performance[cle] = parseInt(valeur, 10);
+  marquerExplore("performance", "Comparaison repos/charge observée sur au moins une ressource.");
+  renderPerformance();
+}
+
+// --- DIAGNOSTIC ---
+function renderDiagnostic(){
+  const cas = DIAGNOSTIC_CAS[ETAT.diagnostic.casIndex];
+  const { hypotheseSelectionnee, etape } = ETAT.diagnostic;
+
+  let corps = "";
+  if (etape === 0){
+    const choixHyp = cas.hypotheses.map(h => `<div class="choice" onclick="diagnosticExplorerHypothese('${h.id}')">${h.texte}</div>`).join("");
+    corps = `
+      <h3>Symptôme</h3>
+      <p>${cas.symptome}</p>
+      <h3>Quelle hypothèse veux-tu explorer ?</h3>
+      <div class="choice-list">${choixHyp}</div>
+      <p class="small">Tu peux explorer une hypothèse, puis revenir explorer l'autre — aucun choix n'est pénalisé.</p>
+    `;
+  } else {
+    const hyp = cas.hypotheses.find(h => h.id === hypotheseSelectionnee);
+    if (etape === 1){
+      corps = `
+        <h3>Hypothèse explorée</h3>
+        <p>${hyp.texte}</p>
+        <div class="btn-row"><button class="btn" onclick="diagnosticLancerTest()">Lancer le test</button></div>
+      `;
+    } else if (etape === 2){
+      corps = `
+        <h3>Test</h3>
+        <p>${hyp.test}</p>
+        <div class="feedback info"><strong>Résultat observé :</strong> ${hyp.resultat}</div>
+        <div class="btn-row"><button class="btn" onclick="diagnosticVoirDiagnostic()">Voir où mène cette piste</button></div>
+      `;
+    } else {
+      corps = `
+        <h3>Ce que cette piste révèle</h3>
+        <div class="feedback calme">${hyp.diagnostic}</div>
+        <div class="btn-row">
+          <button class="btn secondary" onclick="diagnosticRevenirHypotheses()">Explorer l'autre hypothèse</button>
+          ${ETAT.diagnostic.casIndex < DIAGNOSTIC_CAS.length-1
+            ? `<button class="btn" onclick="diagnosticCasSuivant()">Cas suivant</button>`
+            : `<button class="btn" onclick="afficherEcran('accueil')">Retour à l'accueil</button>`}
+        </div>
+      `;
+      marquerExplore("diagnostic", `Piste explorée jusqu'au bout sur le cas ${ETAT.diagnostic.casIndex+1}.`);
+    }
+  }
+
+  app.innerHTML = `
+    ${topbar("DIAGNOSTIC · cas " + (ETAT.diagnostic.casIndex+1) + "/" + DIAGNOSTIC_CAS.length)}
+    <div class="card">${corps}</div>
+  `;
+}
+function diagnosticExplorerHypothese(id){
+  ETAT.diagnostic.hypotheseSelectionnee = id;
+  ETAT.diagnostic.etape = 1;
+  renderDiagnostic();
+}
+function diagnosticLancerTest(){ ETAT.diagnostic.etape = 2; renderDiagnostic(); }
+function diagnosticVoirDiagnostic(){ ETAT.diagnostic.etape = 3; renderDiagnostic(); }
+function diagnosticRevenirHypotheses(){
+  ETAT.diagnostic.hypotheseSelectionnee = null;
+  ETAT.diagnostic.etape = 0;
+  renderDiagnostic();
+}
+function diagnosticCasSuivant(){
+  ETAT.diagnostic.casIndex++;
+  ETAT.diagnostic.hypotheseSelectionnee = null;
+  ETAT.diagnostic.etape = 0;
+  renderDiagnostic();
+}
+
+// --- BILAN D'EXPLORATION (pas une évaluation) ---
+function renderBilan(){
+  const lignes = MODULES.map(m => {
+    const obs = PROGRESSION.derniereObservation[m.id];
+    return `
+      <div class="card">
+        <h3>${m.nom} — ${m.resume}</h3>
+        <p class="small">${m.chapitre}${obs ? " · " + obs : ""}</p>
+      </div>`;
+  }).join("");
+
+  app.innerHTML = `
+    ${topbar("Bilan d'exploration")}
+    <div class="card center">
+      <h1>Tu as exploré ${nombreModulesExplores()} mécanismes de CORE</h1>
+      <p>Chaque module t'a permis d'observer, par toi-même, un principe expliqué dans le livre.</p>
+    </div>
+    ${lignes}
+    <div class="card">
+      <p class="small">CORE LAB est un outil d'observation, pas un examen : rien ici n'a été noté. Reviens à n'importe quel module, à tout moment, pour observer à nouveau ou autrement.</p>
+      <div class="btn-row">
+        <button class="btn secondary" onclick="afficherEcran('accueil')">Revenir explorer</button>
+      </div>
+    </div>
+  `;
+}
+
+/* =========================================================
+   7. ÉVÉNEMENTS
+   ========================================================= */
+document.addEventListener("DOMContentLoaded", function(){ afficherEcran("accueil"); });
+</script>
+</body>
+</html>
